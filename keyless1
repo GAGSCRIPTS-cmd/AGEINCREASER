@@ -1,0 +1,112 @@
+-- AGE INCREASER GUI - Made by GROW A GARDEN SCRIPTERS
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local RunService = game:GetService("RunService")
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+screenGui.Name = "AgeIncreaserGUI"
+screenGui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 240, 0, 170)
+frame.Position = UDim2.new(0.1, 0, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.Active = true
+frame.Draggable = true
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "AGE INCREASER"
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(0, 255, 0)
+title.Font = Enum.Font.GothamBlack
+title.TextScaled = true
+
+local instruction = Instance.new("TextLabel", frame)
+instruction.Size = UDim2.new(1, 0, 0, 20)
+instruction.Position = UDim2.new(0, 0, 0, 30)
+instruction.Text = "YOU NEED TO HOLD THE PETS"
+instruction.BackgroundTransparency = 1
+instruction.TextColor3 = Color3.fromRGB(255, 255, 255)
+instruction.Font = Enum.Font.Gotham
+instruction.TextScaled = true
+
+local button = Instance.new("TextButton", frame)
+button.Size = UDim2.new(1, -20, 0, 40)
+button.Position = UDim2.new(0, 10, 0, 60)
+button.Text = "AUTO AGE PET TO 50"
+button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.Font = Enum.Font.GothamBold
+button.TextScaled = true
+
+local statusLabel = Instance.new("TextLabel", frame)
+statusLabel.Size = UDim2.new(1, -20, 0, 20)
+statusLabel.Position = UDim2.new(0, 10, 0, 110)
+statusLabel.Text = ""
+statusLabel.BackgroundTransparency = 1
+statusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+statusLabel.Font = Enum.Font.GothamBold
+statusLabel.TextScaled = true
+
+local finishLabel = Instance.new("TextLabel", frame)
+finishLabel.Size = UDim2.new(1, -20, 0, 20)
+finishLabel.Position = UDim2.new(0, 10, 0, 135)
+finishLabel.Text = ""
+finishLabel.BackgroundTransparency = 1
+finishLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+finishLabel.Font = Enum.Font.GothamBold
+finishLabel.TextScaled = true
+
+-- Pet Aging Logic
+local aging = false
+
+button.MouseButton1Click:Connect(function()
+	if aging then return end
+	aging = true
+	statusLabel.Text = ""
+
+	local character = LocalPlayer.Character
+	local heldPet = nil
+
+	for _, tool in pairs(character:GetChildren()) do
+		if tool:IsA("Tool") and tool:FindFirstChild("Age") then
+			heldPet = tool
+			break
+		end
+	end
+
+	if not heldPet then
+		statusLabel.Text = "No held pet found!"
+		aging = false
+		return
+	end
+
+	local ageVal = heldPet:FindFirstChild("Age")
+	if not ageVal or not ageVal:IsA("NumberValue") then
+		statusLabel.Text = "No age value detected!"
+		aging = false
+		return
+	end
+
+	statusLabel.Text = "Aging pet..."
+	RunService.Heartbeat:Connect(function()
+		if not aging then return end
+		if heldPet.Parent ~= character then
+			statusLabel.Text = "Pet no longer held!"
+			aging = false
+			return
+		end
+		if ageVal.Value >= 50 then
+			statusLabel.Text = "Pet reached age 50!"
+			finishLabel.Text = "YOU NEED TO WAIT 3-5 MINUTES BEFORE REJOINING"
+			aging = false
+			return
+		end
+		ageVal.Value += 1
+		wait(0.1)
+	end)
+end)
