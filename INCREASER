@@ -1,0 +1,111 @@
+-- 🧬 AGE INCREASER GUI - Made by GROW A GARDEN SCRIPTERS
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Backpack = LocalPlayer:WaitForChild("Backpack")
+local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+
+-- Destroy old GUI if exists
+if LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("AgeGUI") then
+    LocalPlayer.PlayerGui.AgeGUI:Destroy()
+end
+
+-- Create Screen GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AgeGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 200)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.BorderSizePixel = 2
+mainFrame.Parent = screenGui
+
+-- UI Corner
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = mainFrame
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "AGE INCREASER"
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(0, 255, 0)
+title.Font = Enum.Font.FredokaOne
+title.Parent = mainFrame
+
+-- Info Label
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Size = UDim2.new(1, -20, 0, 30)
+infoLabel.Position = UDim2.new(0, 10, 0, 50)
+infoLabel.BackgroundTransparency = 1
+infoLabel.Text = "YOU NEED TO HOLD THE PETS"
+infoLabel.TextScaled = true
+infoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+infoLabel.Font = Enum.Font.GothamBold
+infoLabel.Parent = mainFrame
+
+-- Start Button
+local startBtn = Instance.new("TextButton")
+startBtn.Size = UDim2.new(0.8, 0, 0, 50)
+startBtn.Position = UDim2.new(0.1, 0, 0, 100)
+startBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+startBtn.Text = "AUTO EGG PET TO 50"
+startBtn.TextScaled = true
+startBtn.Font = Enum.Font.GothamBlack
+startBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+startBtn.Parent = mainFrame
+
+local uicorner = Instance.new("UICorner")
+uicorner.Parent = startBtn
+
+-- Function to get held pet
+local function getHeldPet()
+    for _, child in ipairs(Workspace:GetChildren()) do
+        if child:IsA("Model") and child:FindFirstChild("Owner") and child.Owner.Value == LocalPlayer then
+            return child
+        end
+    end
+end
+
+-- Age pet to 50
+local function agePetTo50()
+    local pet = getHeldPet()
+    if pet and pet:FindFirstChild("Age") then
+        local ageValue = pet.Age
+        local currentAge = ageValue.Value
+
+        for i = currentAge + 1, 50 do
+            ageValue.Value = i
+            task.wait(0.2)
+        end
+
+        -- Notify player
+        local message = Instance.new("TextLabel")
+        message.Size = UDim2.new(1, 0, 0, 40)
+        message.Position = UDim2.new(0, 0, 1, -40)
+        message.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        message.TextColor3 = Color3.fromRGB(255, 0, 0)
+        message.Font = Enum.Font.FredokaOne
+        message.TextScaled = true
+        message.Text = "YOU NEED TO WAIT 3-5 MINUTES BEFORE REJOINING"
+        message.Parent = mainFrame
+
+        local corner2 = Instance.new("UICorner")
+        corner2.CornerRadius = UDim.new(0, 8)
+        corner2.Parent = message
+    end
+end
+
+-- Button click
+startBtn.MouseButton1Click:Connect(function()
+    agePetTo50()
+end)
