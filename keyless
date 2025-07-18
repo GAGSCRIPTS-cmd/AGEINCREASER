@@ -1,0 +1,131 @@
+-- 🧬 AGE INCREASER GUI - Made by GROW A GARDEN SCRIPTERS
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+-- Destroy existing GUI
+if LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("AgeGUI") then
+    LocalPlayer.PlayerGui.AgeGUI:Destroy()
+end
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AgeGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Draggable Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 200, 0, 150)
+mainFrame.Position = UDim2.new(0.4, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = mainFrame
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "AGE INCREASER"
+title.TextScaled = true
+title.Font = Enum.Font.FredokaOne
+title.TextColor3 = Color3.fromRGB(0, 255, 0)
+title.Parent = mainFrame
+
+-- Info Text
+local info = Instance.new("TextLabel")
+info.Size = UDim2.new(1, -10, 0, 20)
+info.Position = UDim2.new(0, 5, 0, 35)
+info.BackgroundTransparency = 1
+info.Text = "YOU NEED TO HOLD THE PETS"
+info.TextScaled = true
+info.Font = Enum.Font.GothamBold
+info.TextColor3 = Color3.fromRGB(255, 255, 255)
+info.Parent = mainFrame
+
+-- Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0.85, 0, 0, 40)
+button.Position = UDim2.new(0.075, 0, 0, 70)
+button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+button.Text = "AUTO AGE PET TO 50"
+button.TextScaled = true
+button.Font = Enum.Font.GothamBlack
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.Parent = mainFrame
+
+local uicorner = Instance.new("UICorner")
+uicorner.Parent = button
+
+-- Message label
+local msgLabel = Instance.new("TextLabel")
+msgLabel.Size = UDim2.new(1, -10, 0, 30)
+msgLabel.Position = UDim2.new(0, 5, 1, -35)
+msgLabel.BackgroundTransparency = 0.5
+msgLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+msgLabel.Text = ""
+msgLabel.Visible = false
+msgLabel.TextScaled = true
+msgLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+msgLabel.Font = Enum.Font.GothamBlack
+msgLabel.Parent = mainFrame
+
+local msgCorner = Instance.new("UICorner")
+msgCorner.CornerRadius = UDim.new(0, 8)
+msgCorner.Parent = msgLabel
+
+-- Function to get held pet
+local function getHeldPet()
+	for _, pet in ipairs(Workspace:GetChildren()) do
+		if pet:IsA("Model") and pet:FindFirstChild("Owner") and pet.Owner.Value == LocalPlayer then
+			if pet:FindFirstChild("Age") and pet:FindFirstChild("PrimaryPart") then
+				if (pet.PrimaryPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 15 then
+					return pet
+				end
+			end
+		end
+	end
+end
+
+-- Function to age pet
+local function agePetTo50()
+	local pet = getHeldPet()
+	if not pet then
+		msgLabel.Text = "No held pet found!"
+		msgLabel.Visible = true
+		return
+	end
+
+	local age = pet:FindFirstChild("Age")
+	if age and age:IsA("IntValue") then
+		local startAge = age.Value
+		for i = startAge + 1, 50 do
+			if not getHeldPet() then
+				msgLabel.Text = "Pet was dropped!"
+				msgLabel.Visible = true
+				return
+			end
+			age.Value = i
+			task.wait(0.15)
+		end
+
+		msgLabel.Text = "YOU NEED TO WAIT 3-5 MINUTES BEFORE REJOINING"
+		msgLabel.Visible = true
+	else
+		msgLabel.Text = "Pet has no valid Age property!"
+		msgLabel.Visible = true
+	end
+end
+
+-- Connect button
+button.MouseButton1Click:Connect(function()
+	agePetTo50()
+end)
